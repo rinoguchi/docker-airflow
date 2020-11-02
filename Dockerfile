@@ -12,7 +12,8 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.9
+# NOTE: 最新のバージョンを取得
+ARG AIRFLOW_VERSION=1.10.12
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS=""
 ARG PYTHON_DEPS=""
@@ -59,8 +60,12 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
-    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
+    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION}  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-1.10.12/constraints-3.7.txt"\
     && pip install 'redis==3.2' \
+    # NOTE: Broken DAG: [/usr/local/airflow/dags/sample.py] No module named 'docker' の回避
+    && pip install docker \
+    # NOTE: sqlalchemy.exc.NoInspectionAvailable: No inspection system is available for object of type の回避
+    && pip install 'SQLAlchemy==1.3.15'\ 
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
@@ -72,6 +77,11 @@ RUN set -ex \
         /usr/share/man \
         /usr/share/doc \
         /usr/share/doc-base
+
+# NOTE: ERROR - Error while fetching server API version: ('Connection aborted.', PermissionError(13, 'Permission denied')) の回避
+RUN apt-get update && \
+    apt-get -y install sudo
+RUN echo airflow:airflow | chpasswd && adduser airflow sudo
 
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg

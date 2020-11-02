@@ -28,6 +28,11 @@ if [ -e "/requirements.txt" ]; then
     $(command -v pip) install --user -r /requirements.txt
 fi
 
+# NOTE: ERROR - Error while fetching server API version: ('Connection aborted.', PermissionError(13, 'Permission denied')) の回避
+if [ -e /var/run/docker.sock ]; then 
+  echo airflow | sudo -S chmod 777 /var/run/docker.sock; 
+fi
+
 wait_for_port() {
   local name="$1" host="$2" port="$3"
   local j=0
