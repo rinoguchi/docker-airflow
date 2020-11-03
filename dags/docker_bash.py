@@ -22,7 +22,7 @@ with DAG("docker_bash_sample", default_args=default_args, schedule_interval=time
         image='centos:latest',
         api_version='auto',
         auto_remove=True,
-        command="sleep 30",
+        command="""/bin/bash -c \'echo "1" && sleep 30 && echo "2"\'""",
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge",
     )
