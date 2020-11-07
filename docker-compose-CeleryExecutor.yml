@@ -80,6 +80,7 @@ services:
             - scheduler
         volumes:
             - ./dags:/usr/local/airflow/dags
+            - ./envfiles:/usr/local/airflow/envfiles
             # ERROR - Error while fetching server API version: ('Connection aborted.', FileNotFoundError(2, 'No such file or directory')) の回避
             - /var/run/docker.sock:/var/run/docker.sock
             # Uncomment to include custom plugins

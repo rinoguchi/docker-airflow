@@ -60,12 +60,15 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
+    # NOTE: ImportError: cannot import name 'resolve_types' from 'attr' (/usr/local/lib/python3.7/site-packages/attr/__init__.py) 回避のため、constraintsファイルを読み込んでいる
     && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION}  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-1.10.12/constraints-3.7.txt"\
     && pip install 'redis==3.2' \
     # NOTE: Broken DAG: [/usr/local/airflow/dags/sample.py] No module named 'docker' の回避
     && pip install docker \
     # NOTE: sqlalchemy.exc.NoInspectionAvailable: No inspection system is available for object of type の回避
     && pip install 'SQLAlchemy==1.3.15'\ 
+    # NOTE: .env読み込みのため
+    && pip install python-dotenv\
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \

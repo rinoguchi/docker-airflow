@@ -6,6 +6,7 @@ authors = ["Inoguchi Ryoichi <r.inoguchi@astamuse.co.jp>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+python-dotenv = "^0.15.0"
 
 [tool.poetry.dev-dependencies]
 apache-airflow = "^1.10.12"
